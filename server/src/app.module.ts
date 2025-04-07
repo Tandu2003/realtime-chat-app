@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { SocketGateway } from './socket/socket.gateway';
 import { ChatGateway } from './chat/chat.gateway';
 import { ConversationModule } from './conversation/conversation.module';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ConversationModule } from './conversation/conversation.module';
     ),
     UserModule,
     ConversationModule,
+    MessageModule,
   ],
   providers: [SocketGateway, ChatGateway],
 })

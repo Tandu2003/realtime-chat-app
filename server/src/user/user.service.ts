@@ -18,6 +18,10 @@ export class UserService {
     return this.userModel.find();
   }
 
+  async findById(id: string) {
+    return this.userModel.findById(id);
+  }
+
   async follow(userId: string, targetId: string): Promise<string> {
     const user = await this.userModel.findById(userId);
     const target = await this.userModel.findById(targetId);
