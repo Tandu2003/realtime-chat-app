@@ -10,11 +10,14 @@ export class Conversation {
   @Prop({ type: Boolean, default: false })
   isGroup: boolean;
 
-  @Prop()
-  name?: string;
+  @Prop({ type: String, default: '' })
+  name: string; // Chỉ dùng nếu là group chat
 
-  @Prop()
-  groupImage?: string;
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  createdBy: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Message' })
+  lastMessage: Types.ObjectId;
 }
 
 export type ConversationDocument = Conversation & Document;
