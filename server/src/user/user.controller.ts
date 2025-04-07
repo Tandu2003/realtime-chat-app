@@ -1,4 +1,6 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Request } from 'express';
+
+import { Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 
 import { UserService } from './user.service';
 
@@ -11,19 +13,21 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Post(':userId/follow/:targetId')
-  async followUser(
-    @Param('userId') userId: string,
-    @Param('targetId') targetId: string,
-  ) {
+  @Post('follow/:targetId')
+  async followUser(@Param('targetId') targetId: string, @Req() req: Request) {
+    const userId = req['user'].userId;
     return this.userService.follow(userId, targetId);
   }
 
-  @Get(':userId/search')
-  async searchUsers(
-    @Param('userId') userId: string,
-    @Query('q') query: string,
-  ) {
+  @Get('search')
+  async searchUsers(@Query('q') query: string, @Req() req: Request) {
+    const userId = req['user'].userId;
     return this.userService.searchUsers(query, userId);
+  }
+
+  @Get('me')
+  async getMe(@Req() req: Request) {
+    const userId = req['user'].userId;
+    return this.userService.findById(userId);
   }
 }

@@ -2,9 +2,9 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { AuthMiddleware } from './auth/auth.middleware';
 import { AuthModule } from './auth/auth.module';
 import { ChatGateway } from './chat/chat.gateway';
+import { AuthMiddleware } from './common/middleware/auth.middleware';
 import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
 import { SocketGateway } from './socket/socket.gateway';
@@ -27,6 +27,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .forRoutes({ path: 'auth/me', method: RequestMethod.GET });
+      .exclude('auth/(.*)') // Không check token cho login/register
+      .forRoutes('*'); // Áp dụng cho tất cả route
   }
 }
