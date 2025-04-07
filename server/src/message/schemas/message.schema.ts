@@ -15,6 +15,12 @@ export class Message {
 
   @Prop({ default: false })
   seen: boolean;
+
+  @Prop({ type: Date, default: Date.now })
+  sentAt: Date;
+
+  @Prop({ default: false })
+  deleted: boolean;
 }
 
 export type MessageDocument = Message & Document;

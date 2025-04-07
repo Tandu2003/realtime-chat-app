@@ -6,24 +6,22 @@ import { MessageService } from './message.service';
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
-  // POST /messages/send
-  @Post('send')
+  @Post(':conversationId/send')
   async sendMessage(
-    @Body() body: { conversationId: string; senderId: string; text: string },
+    @Param('conversationId') conversationId: string,
+    @Body('senderId') senderId: string,
+    @Body('text') text: string,
   ) {
-    const { conversationId, senderId, text } = body;
     return this.messageService.sendMessage(conversationId, senderId, text);
   }
 
-  // GET /messages/:conversationId
   @Get(':conversationId')
   async getMessages(@Param('conversationId') conversationId: string) {
     return this.messageService.getMessages(conversationId);
   }
 
-  // PATCH /messages/seen/:id
-  @Patch('seen/:id')
-  async markAsSeen(@Param('id') messageId: string) {
+  @Patch(':messageId/seen')
+  async markAsSeen(@Param('messageId') messageId: string) {
     return this.messageService.markAsSeen(messageId);
   }
 }
