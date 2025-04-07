@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { UserModule } from './user/user.module';
+import { SocketGateway } from './socket/socket.gateway';
+import { ChatGateway } from './chat/chat.gateway';
 
 @Module({
   imports: [
@@ -12,5 +14,6 @@ import { UserModule } from './user/user.module';
     ),
     UserModule,
   ],
+  providers: [SocketGateway, ChatGateway],
 })
 export class AppModule {}

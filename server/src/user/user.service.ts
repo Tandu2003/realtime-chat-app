@@ -1,9 +1,9 @@
-import { Model, Types } from "mongoose";
+import { Model, Types } from 'mongoose';
 
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 
-import { User, UserDocument } from "./schemas/user.schema";
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
@@ -76,5 +76,21 @@ export class UserService {
     });
 
     return users;
+  }
+
+  async setUserOnline(userId: string, socketId: string) {
+    return this.userModel.findByIdAndUpdate(userId, {
+      isOnline: true,
+      socketId,
+      lastSeen: new Date(),
+    });
+  }
+
+  async setUserOffline(userId: string) {
+    return this.userModel.findByIdAndUpdate(userId, {
+      isOnline: false,
+      socketId: '',
+      lastSeen: new Date(),
+    });
   }
 }
