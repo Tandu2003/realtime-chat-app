@@ -20,7 +20,11 @@ export class ConversationService {
       .find({
         participants: userId,
       })
-      .populate('participants', '-password');
+      .populate([
+        { path: 'participants', select: '-password' },
+        { path: 'lastMessage' },
+      ])
+      .sort({ updatedAt: -1 });
   }
 
   async findOrCreateOneOnOne(userA: string, userB: string) {
@@ -35,6 +39,27 @@ export class ConversationService {
       participants: [userA, userB],
     });
 
-    return newConvo.save();
+    const savedConvo = await newConvo.save();
+
+    return savedConvo.populate('participants', '-password');
+  }
+
+  async createGroupChat(
+    userIds: string[],
+    name: string,
+    createdBy: string,
+  ): Promise<Conversation> {
+    if (userIds.length < 2) {
+      throw new Error('A group must have at least 3 members including you');
+    }
+
+    const newGroup = new this.conversationModel({
+      participants: [...new Set([...userIds, createdBy])],
+      isGroup: true,
+      name,
+      createdBy,
+    });
+
+    return newGroup.save();
   }
 }

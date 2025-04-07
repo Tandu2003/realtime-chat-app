@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 
 import { ConversationService } from './conversation.service';
 
@@ -6,13 +6,25 @@ import { ConversationService } from './conversation.service';
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}
 
-  @Get(':userId')
-  getUserConversations(@Param('userId') userId: string) {
-    return this.conversationService.getUserConversations(userId);
+  @Get()
+  async getUserConversations(@Req() req: any) {
+    return this.conversationService.getUserConversations(req.user._id);
   }
 
   @Get('one-on-one/find')
   findOneOnOne(@Query('userA') userA: string, @Query('userB') userB: string) {
     return this.conversationService.findOrCreateOneOnOne(userA, userB);
+  }
+
+  @Post('group')
+  async createGroup(
+    @Body() body: { userIds: string[]; name: string },
+    @Req() req: any,
+  ) {
+    return this.conversationService.createGroupChat(
+      body.userIds,
+      body.name,
+      req.user._id, // từ AuthMiddleware
+    );
   }
 }
