@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Req } from '@nestjs/common';
 
 import { MessageService } from './message.service';
 
@@ -9,9 +9,10 @@ export class MessageController {
   @Post(':conversationId/send')
   async sendMessage(
     @Param('conversationId') conversationId: string,
-    @Body('senderId') senderId: string,
     @Body('text') text: string,
+    @Req() req: any,
   ) {
+    const senderId = req.user.userId;
     return this.messageService.sendMessage(conversationId, senderId, text);
   }
 

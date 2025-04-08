@@ -2,7 +2,7 @@ import "./globals.css";
 
 import { ReactNode } from "react";
 
-import { Providers } from "@/store/provider";
+import { ReduxProvider } from "@/redux/provider";
 
 export const metadata = {
   title: "My Chat App",
@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>
   );
