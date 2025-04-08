@@ -3,11 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { AuthModule } from './auth/auth.module';
-import { ChatGateway } from './chat/chat.gateway';
 import { AuthMiddleware } from './common/middleware/auth.middleware';
 import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
-import { SocketGateway } from './socket/socket.gateway';
+import { ChatGateway } from './socket/chat.gateway';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -21,7 +20,7 @@ import { UserModule } from './user/user.module';
     MessageModule,
     AuthModule,
   ],
-  providers: [SocketGateway, ChatGateway],
+  providers: [ChatGateway],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

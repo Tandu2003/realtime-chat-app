@@ -5,6 +5,7 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
@@ -17,31 +18,65 @@ import { UserService } from '../user/user.service';
     origin: '*',
   },
 })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
+  private server: Server;
+
   constructor(
     private readonly userService: UserService,
     private readonly messageService: MessageService,
   ) {}
 
+  afterInit(server: Server) {
+    this.server = server;
+  }
+
   async handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
-
     if (!userId) {
       client.disconnect();
       return;
     }
 
     await this.userService.setUserOnline(userId, client.id);
-    console.log(`🔌 User ${userId} connected`);
+    console.log(`✅ User ${userId} connected`);
+
+    this.broadcastOnlineUsers(); // 👈 NEW
   }
 
   async handleDisconnect(client: Socket) {
     await this.userService.setUserOffline(client.id);
-    console.log(`❌ User disconnected: ${client.id}`);
+    console.log(`❌ Socket disconnected: ${client.id}`);
+
+    this.broadcastOnlineUsers(); // 👈 NEW
+  }
+
+  private async broadcastOnlineUsers() {
+    const onlineUsers = await this.userService.getOnlineUsers(); // 👈 viết hàm này trong userService
+    this.server.emit(
+      'online-users',
+      onlineUsers.map((user) => ({
+        _id: user._id,
+        name: user.name, // hoặc avatar, email... tùy frontend
+      })),
+    );
+  }
+
+  @SubscribeMessage('get-online-users')
+  async handleGetOnlineUsers(@ConnectedSocket() client: Socket) {
+    const onlineUsers = await this.userService.getOnlineUsers();
+    client.emit(
+      'online-users',
+      onlineUsers.map((user) => ({
+        _id: user._id,
+        name: user.name,
+      })),
+    );
   }
 
   @SubscribeMessage('send-message')
-  async handleMessage(
+  async handleSendMessage(
     @MessageBody()
     data: {
       conversationId: string;
@@ -59,13 +94,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       text,
     );
 
-    // Gửi message cho người nhận nếu đang online
     const receiver = await this.userService.findById(receiverId);
     if (receiver?.isOnline && receiver.socketId) {
       client.to(receiver.socketId).emit('new-message', message);
     }
 
-    // Trả lại cho người gửi
     client.emit('message-sent', message);
   }
 }

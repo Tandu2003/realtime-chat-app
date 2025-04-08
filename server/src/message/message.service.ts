@@ -23,8 +23,9 @@ export class MessageService {
   }
 
   async getMessages(conversationId: string) {
+    const objectId = new Types.ObjectId(conversationId);
     return this.messageModel
-      .find({ conversation: conversationId })
+      .find({ conversation: objectId })
       .sort({ createdAt: 1 })
       .populate('sender', 'username name profilePicture');
   }

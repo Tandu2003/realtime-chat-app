@@ -77,19 +77,27 @@ export class UserService {
     return users;
   }
 
+  // Đặt socketId và isOnline=true
   async setUserOnline(userId: string, socketId: string) {
     return this.userModel.findByIdAndUpdate(userId, {
       isOnline: true,
       socketId,
-      lastSeen: new Date(),
     });
   }
 
-  async setUserOffline(userId: string) {
-    return this.userModel.findByIdAndUpdate(userId, {
-      isOnline: false,
-      socketId: '',
-      lastSeen: new Date(),
-    });
+  // Tìm theo socketId, đặt isOnline=false
+  async setUserOffline(socketId: string) {
+    return this.userModel.findOneAndUpdate(
+      { socketId },
+      {
+        isOnline: false,
+        socketId: null,
+      },
+    );
+  }
+
+  // Trả về tất cả user đang online
+  async getOnlineUsers() {
+    return this.userModel.find({ isOnline: true });
   }
 }

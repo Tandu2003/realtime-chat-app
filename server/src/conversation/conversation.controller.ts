@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 
 import { ConversationService } from './conversation.service';
 
@@ -11,11 +20,24 @@ export class ConversationController {
     return this.conversationService.getUserConversations(req.user._id);
   }
 
-  @Get('one-on-one/find')
-  findOneOnOne(@Query('userA') userA: string, @Query('userB') userB: string) {
-    return this.conversationService.findOrCreateOneOnOne(userA, userB);
+  // Tìm cuộc trò chuyện 1-1 giữa 2 người dùng
+  @Post('one-on-one')
+  async findOneOnOne(
+    @Body('userOtherId') userOtherId: string,
+    @Req() req: any,
+  ) {
+    const userId = req['user'].userId;
+    if (!userOtherId) {
+      throw new BadRequestException('Thiếu thông tin người dùng');
+    }
+
+    return this.conversationService.findOrCreateOneOnOneConversation(
+      userId,
+      userOtherId,
+    );
   }
 
+  // Tạo nhóm trò chuyện
   @Post('group')
   async createGroup(
     @Body() body: { userIds: string[]; name: string },
@@ -24,7 +46,7 @@ export class ConversationController {
     return this.conversationService.createGroupChat(
       body.userIds,
       body.name,
-      req.user._id, // từ AuthMiddleware
+      req.user._id,
     );
   }
 }

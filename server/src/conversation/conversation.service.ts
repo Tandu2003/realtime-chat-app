@@ -1,12 +1,12 @@
-import { Model } from 'mongoose';
+import { Model, Types } from "mongoose";
 
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
 
 import {
   Conversation,
-  ConversationDocument,
-} from './schemas/conversation.schema';
+  ConversationDocument
+} from "./schemas/conversation.schema";
 
 @Injectable()
 export class ConversationService {
@@ -15,6 +15,7 @@ export class ConversationService {
     private conversationModel: Model<ConversationDocument>,
   ) {}
 
+  // Lấy danh sách cuộc trò chuyện của người dùng
   async getUserConversations(userId: string) {
     return this.conversationModel
       .find({
@@ -27,30 +28,51 @@ export class ConversationService {
       .sort({ updatedAt: -1 });
   }
 
-  async findOrCreateOneOnOne(userA: string, userB: string) {
-    const existing = await this.conversationModel.findOne({
+  // Tìm cuộc trò chuyện 1-1 giữa 2 người dùng nếu chưa có thì tạo mới
+  async findOrCreateOneOnOneConversation(userId: string, userOtherId: string) {
+    // Kiểm tra xem cuộc trò chuyện đã tồn tại chưa
+    const existingConversation = await this.conversationModel
+      .findOne({
+        type: 'one-on-one',
+        isGroup: false,
+        participants: { $all: [userId, userOtherId], $size: 2 },
+      })
+      .populate('participants', '-password');
+
+    // Nếu đã tồn tại thì trả về cuộc trò chuyện đó
+    if (existingConversation) return existingConversation;
+
+    // Nếu chưa tồn tại thì tạo mới
+    const newConversation = new this.conversationModel({
+      participants: [userId, userOtherId],
       isGroup: false,
-      participants: { $all: [userA, userB], $size: 2 },
+      type: 'one-on-one',
+      createdBy: userId,
     });
 
-    if (existing) return existing;
-
-    const newConvo = new this.conversationModel({
-      participants: [userA, userB],
-    });
-
-    const savedConvo = await newConvo.save();
-
-    return savedConvo.populate('participants', '-password');
+    const savedConversation = await newConversation.save();
+    return savedConversation.populate('participants', '-password');
   }
 
+  // Tạo nhóm trò chuyện
   async createGroupChat(
     userIds: string[],
     name: string,
     createdBy: string,
   ): Promise<Conversation> {
+    // Kiểm tra xem người dùng đã tham gia cuộc trò chuyện chưa
+    const existingConversation = await this.conversationModel.findOne({
+      isGroup: true,
+      participants: { $all: userIds, $size: userIds.length },
+    });
+    if (existingConversation) {
+      throw new BadRequestException('Cuộc trò chuyện đã tồn tại');
+    }
+
     if (userIds.length < 2) {
-      throw new Error('A group must have at least 3 members including you');
+      throw new BadRequestException(
+        'Số lượng người tham gia cuộc trò chuyện phải lớn hơn 2',
+      );
     }
 
     const newGroup = new this.conversationModel({
@@ -61,5 +83,25 @@ export class ConversationService {
     });
 
     return newGroup.save();
+  }
+
+  // Cập nhật tin nhắn cuối cùng trong cuộc trò chuyện
+  async updateLastMessage(conversationId: string, messageId: string) {
+    return this.conversationModel.findByIdAndUpdate(
+      conversationId,
+      { lastMessage: messageId },
+      { new: true },
+    );
+  }
+
+  // Lấy thông tin cuộc trò chuyện theo id
+  async getConversationWithLastMessage(conversationId: string) {
+    return this.conversationModel.findById(conversationId).populate([
+      { path: 'participants', select: '-password' },
+      {
+        path: 'lastMessage',
+        populate: { path: 'sender', select: 'username name profilePicture' },
+      },
+    ]);
   }
 }
