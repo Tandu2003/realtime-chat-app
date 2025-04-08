@@ -74,6 +74,7 @@ NEXT_PUBLIC_API_URL=http://localhost:6789
 ```env
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret_key
+CLIENT_URL=http://localhost:1234
 ```
 
 ## Running the Application
