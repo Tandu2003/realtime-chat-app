@@ -1,8 +1,8 @@
-import { Request } from 'express';
+import { Request } from "express";
 
-import { Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, Req } from "@nestjs/common";
 
-import { UserService } from './user.service';
+import { UserService } from "./user.service";
 
 @Controller('users')
 export class UserController {
@@ -28,6 +28,11 @@ export class UserController {
   @Get('me')
   async getMe(@Req() req: Request) {
     const userId = req['user'].userId;
+    return this.userService.findById(userId);
+  }
+
+  @Get(':userId')
+  async getUserById(@Param('userId') userId: string) {
     return this.userService.findById(userId);
   }
 }

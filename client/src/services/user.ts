@@ -15,6 +15,11 @@ const UserService = {
     const response = await axiosInstance.get(`/users/me`);
     return response.data;
   },
+
+  async getUserById(userId: string) {
+    const response = await axiosInstance.get(`/users/${userId}`);
+    return response.data;
+  },
 };
 
 export default UserService;
