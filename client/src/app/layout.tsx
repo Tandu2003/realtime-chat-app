@@ -2,6 +2,7 @@ import "./globals.css";
 
 import { ReactNode } from "react";
 
+import AuthInitProvider from "@/components/providers/AuthInitProvider";
 import { ReduxProvider } from "@/redux/provider";
 
 export const metadata = {
@@ -13,7 +14,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <ReduxProvider>{children}</ReduxProvider>
+        <ReduxProvider>
+          <AuthInitProvider>{children}</AuthInitProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

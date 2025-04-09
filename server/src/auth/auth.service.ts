@@ -28,10 +28,15 @@ export class AuthService {
     const { username, name, email, password } = data;
 
     // Kiểm tra email hoặc username đã tồn tại chưa
-    const existingUser = await this.userModel.findOne({
-      $or: [{ email }, { username }],
-    });
-    if (existingUser) throw new ConflictException('Email đã được sử dụng');
+    const existingEmail = await this.userModel.findOne({ email });
+    if (existingEmail) {
+      throw new ConflictException('Email đã tồn tại.');
+    }
+
+    const existingUserName = await this.userModel.findOne({ username });
+    if (existingUserName) {
+      throw new ConflictException('Username đã tồn tại.');
+    }
 
     // Mã hóa mật khẩu
     const hashedPassword = await bcrypt.hash(password, 10);
