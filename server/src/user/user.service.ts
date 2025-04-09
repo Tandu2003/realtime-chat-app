@@ -14,7 +14,7 @@ export class UserService {
   }
 
   async findById(id: string) {
-    return this.userModel.findById(id);
+    return this.userModel.findById(id).select('-password');
   }
 
   async follow(userId: string, targetId: string): Promise<string> {

@@ -15,7 +15,8 @@ import { UserService } from '../user/user.service';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: process.env.CLIENT_URL,
+    credentials: true,
   },
 })
 export class ChatGateway

@@ -73,11 +73,16 @@ export default function LoginForm() {
 
         dispatch(
           setUser({
-            isLoggedIn: true,
+            _id: response.user._id,
+            name: response.user.name,
             username: response.user.username,
             email: response.user.email,
-            name: response.user.name,
             profilePicture: response.user.profilePicture,
+            isActive: response.user.isActive,
+            isOnline: response.user.isOnline,
+            followers: response.user.followers,
+            following: response.user.following,
+            isLoggedIn: true,
           })
         );
 

@@ -17,7 +17,8 @@ export class ConversationController {
 
   @Get()
   async getUserConversations(@Req() req: any) {
-    return this.conversationService.getUserConversations(req.user._id);
+    const userId = req['user'].userId;
+    return this.conversationService.getUserConversations(userId);
   }
 
   // Tìm cuộc trò chuyện 1-1 giữa 2 người dùng

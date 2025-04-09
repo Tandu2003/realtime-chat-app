@@ -1,14 +1,28 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserState {
+  _id: string;
+  name: string;
+  username: string;
+  email: string;
+  profilePicture: string;
+  isActive: boolean;
+  isOnline: boolean;
+  followers: string[];
+  following: string[];
   isLoggedIn: boolean;
-  profilePicture?: string;
-  username?: string;
-  email?: string;
-  name?: string;
 }
 
 const initialState: UserState = {
+  _id: "",
+  name: "",
+  username: "",
+  email: "",
+  profilePicture: "",
+  isActive: false,
+  isOnline: false,
+  followers: [],
+  following: [],
   isLoggedIn: false,
 };
 
@@ -25,6 +39,7 @@ const userSlice = createSlice({
     },
     logout() {
       return {
+        ...initialState,
         isLoggedIn: false,
       };
     },
