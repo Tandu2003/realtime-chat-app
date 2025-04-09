@@ -1,12 +1,12 @@
-import { Model, Types } from "mongoose";
+import { Model, Types } from 'mongoose';
 
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 
 import {
   Conversation,
-  ConversationDocument
-} from "./schemas/conversation.schema";
+  ConversationDocument,
+} from './schemas/conversation.schema';
 
 @Injectable()
 export class ConversationService {
@@ -26,6 +26,15 @@ export class ConversationService {
         { path: 'lastMessage' },
       ])
       .sort({ updatedAt: -1 });
+  }
+
+  async getConversationById(conversationId: string) {
+    const conversation = await this.conversationModel.findById(conversationId);
+
+    if (!conversation) {
+      throw new BadRequestException('Cuộc trò chuyện không tồn tại');
+    }
+    return conversation;
   }
 
   // Tìm cuộc trò chuyện 1-1 giữa 2 người dùng nếu chưa có thì tạo mới

@@ -5,7 +5,9 @@ import { useSelector } from "react-redux";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { connectSocket, getSocket } from "@/lib/socket";
 import { RootState } from "@/redux/store";
+import ConversationService from "@/services/conversation";
 import MessageService from "@/services/message";
 
 interface ChatFormProps {
@@ -17,6 +19,12 @@ export default function ChatForm({ conversationId }: ChatFormProps) {
   const [text, setText] = useState("");
   const me = useSelector((state: RootState) => state.user);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const getReceiverId = async () => {
+    const conversation = await ConversationService.getConversationById(conversationId);
+    const receiverId = conversation.participants.find((id: string) => id !== me._id);
+    return receiverId || "";
+  };
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -38,14 +46,49 @@ export default function ChatForm({ conversationId }: ChatFormProps) {
   const handleSendMessage = async () => {
     if (!text.trim()) return;
 
-    try {
-      const newMessage = await MessageService.sendMessage(conversationId, text.trim());
-      setMessages((prev) => [...prev, newMessage]);
-      setText("");
-    } catch (err) {
-      console.error("Send message failed", err);
-    }
+    const socket = getSocket();
+    const receiverId = await getReceiverId();
+
+    console.log("📤 Sending message:", {
+      conversationId,
+      senderId: me._id,
+      text: text.trim(),
+      receiverId,
+    });
+
+    socket.emit("send-message", {
+      conversationId,
+      senderId: me._id,
+      text: text.trim(),
+      receiverId,
+    });
+
+    setText("");
   };
+
+  useEffect(() => {
+    const socket = connectSocket(me._id);
+
+    const handleNewMessage = (message: any) => {
+      if (message.conversation === conversationId) {
+        setMessages((prev) => [...prev, message]);
+      }
+    };
+
+    const handleMessageSent = (message: any) => {
+      if (message.conversation === conversationId) {
+        setMessages((prev) => [...prev, message]);
+      }
+    };
+
+    socket.on("new-message", handleNewMessage);
+    socket.on("message-sent", handleMessageSent);
+
+    return () => {
+      socket.off("new-message", handleNewMessage);
+      socket.off("message-sent", handleMessageSent);
+    };
+  }, [conversationId, me._id]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {

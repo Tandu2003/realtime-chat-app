@@ -15,7 +15,7 @@ import { UserService } from '../user/user.service';
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: [process.env.CLIENT_URL || 'http://localhost:1234'],
     credentials: true,
   },
 })
@@ -95,11 +95,15 @@ export class ChatGateway
       text,
     );
 
+    // Gửi cho người gửi
+    client.emit('message-sent', message);
+
+    // Gửi cho người nhận
     const receiver = await this.userService.findById(receiverId);
     if (receiver?.isOnline && receiver.socketId) {
-      client.to(receiver.socketId).emit('new-message', message);
+      this.server.to(receiver.socketId).emit('new-message', message);
     }
 
-    client.emit('message-sent', message);
+    console.log('📤 Sending message to socket:', receiver?.socketId);
   }
 }

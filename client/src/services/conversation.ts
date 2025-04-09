@@ -6,6 +6,11 @@ const ConversationService = {
     return response.data;
   },
 
+  async getConversationById(conversationId: string) {
+    const response = await axiosInstance.get(`/conversations/${conversationId}`);
+    return response.data;
+  },
+
   async findOrCreateOneOnOneConversation(userOtherId: string) {
     const response = await axiosInstance.post("/conversations/one-on-one", {
       userOtherId,

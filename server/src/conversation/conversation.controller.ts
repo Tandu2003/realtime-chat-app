@@ -21,6 +21,14 @@ export class ConversationController {
     return this.conversationService.getUserConversations(userId);
   }
 
+  @Get(':id')
+  async getConversationById(@Param('id') id: string) {
+    if (!id) {
+      throw new BadRequestException('Thiếu thông tin hội thoại');
+    }
+    return this.conversationService.getConversationById(id);
+  }
+
   // Tìm cuộc trò chuyện 1-1 giữa 2 người dùng
   @Post('one-on-one')
   async findOneOnOne(
