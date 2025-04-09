@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { connectSocket, getSocket } from "@/lib/socket";
 import { RootState } from "@/redux/store";
 import ConversationService from "@/services/conversation";
 
@@ -19,7 +20,8 @@ interface Conversation {
   _id: string;
   isGroup: boolean;
   participants: User[];
-  latestMessage?: {
+  lastMessage?: {
+    sender: string;
     text: string;
     createdAt: string;
   };
@@ -60,6 +62,31 @@ export default function ConversationForm({
     }
   };
 
+  useEffect(() => {
+    console.log("Conversations:", conversations);
+  }, [conversations]);
+
+  useEffect(() => {
+    const socket = connectSocket(me._id);
+
+    const handleConversationUpdate = (payload: {
+      conversationId: string;
+      lastMessage: { sender: string; text: string; createdAt: string };
+    }) => {
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv._id === payload.conversationId ? { ...conv, lastMessage: payload.lastMessage } : conv
+        )
+      );
+    };
+
+    socket.on("conversation-updated", handleConversationUpdate);
+
+    return () => {
+      socket.off("conversation-updated", handleConversationUpdate);
+    };
+  }, [me._id]);
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold mb-2">Tin nhắn gần đây</h2>
@@ -88,7 +115,18 @@ export default function ConversationForm({
               <div className="flex-1">
                 <p className="font-medium">{userOther.name}</p>
                 <p className="text-sm text-gray-500 truncate">
-                  {conv.latestMessage?.text || "Chưa có tin nhắn"}
+                  {me._id === conv.lastMessage?.sender ? "Bạn: " : ""}
+                  {conv.lastMessage?.text || ""}
+                  {conv.lastMessage?.createdAt &&
+                    ` - ${new Date(conv.lastMessage.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}`}
+                  {conv.lastMessage?.createdAt && (
+                    <span className="text-gray-400 text-xs ml-1">
+                      {new Date(conv.lastMessage.createdAt).toLocaleDateString()}
+                    </span>
+                  )}
                 </p>
               </div>
             </div>

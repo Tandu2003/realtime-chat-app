@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io';
+import { ConversationService } from 'src/conversation/conversation.service';
 
 import {
   ConnectedSocket,
@@ -27,6 +28,7 @@ export class ChatGateway
   constructor(
     private readonly userService: UserService,
     private readonly messageService: MessageService,
+    private readonly conversationService: ConversationService,
   ) {}
 
   afterInit(server: Server) {
@@ -94,6 +96,22 @@ export class ChatGateway
       senderId,
       text,
     );
+
+    await this.conversationService.updateLastMessageObject(conversationId, {
+      sender: senderId,
+      text,
+      createdAt: new Date(),
+    });
+
+    // Emit cho UI cập nhật danh sách hội thoại realtime
+    this.server.emit('conversation-updated', {
+      conversationId,
+      lastMessage: {
+        sender: senderId,
+        text,
+        createdAt: new Date(),
+      },
+    });
 
     // Gửi cho người gửi
     client.emit('message-sent', message);

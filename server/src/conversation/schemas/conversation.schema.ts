@@ -19,8 +19,19 @@ export class Conversation {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   createdBy: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Message' })
-  lastMessage: Types.ObjectId;
+  @Prop({
+    type: {
+      sender: { type: Types.ObjectId, ref: 'User' },
+      text: String,
+      createdAt: Date,
+    },
+    default: null,
+  })
+  lastMessage: {
+    sender: Types.ObjectId;
+    text: string;
+    createdAt: Date;
+  } | null;
 }
 
 export type ConversationDocument = Conversation & Document;

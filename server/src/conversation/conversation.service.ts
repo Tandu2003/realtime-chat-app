@@ -113,4 +113,19 @@ export class ConversationService {
       },
     ]);
   }
+
+  async updateLastMessageObject(
+    conversationId: string,
+    message: {
+      sender: string;
+      text: string;
+      createdAt: Date;
+    },
+  ) {
+    return this.conversationModel.findByIdAndUpdate(
+      conversationId,
+      { lastMessage: message },
+      { new: true },
+    );
+  }
 }
