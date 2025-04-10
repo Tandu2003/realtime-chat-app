@@ -18,6 +18,10 @@ interface User {
   name: string;
   email: string;
   profilePicture?: string;
+  isOnline?: boolean;
+  lastSeen?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface Conversation {
@@ -167,52 +171,49 @@ export default function ConversationForm({
   };
 
   return (
-    <div className="space-y-5 h-full flex flex-col">
+    <div className="flex h-full flex-col space-y-5">
       <div className="relative">
         <Input
           type="text"
           placeholder="Tìm người dùng..."
           value={searchQuery}
           onChange={handleSearch}
-          className="pl-9 pr-3 h-10 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400 focus:ring-blue-100"
+          className="h-10 rounded-xl border-gray-200 bg-gray-50 pl-9 pr-3 shadow-sm focus:border-blue-400 focus:ring-blue-100"
         />
-        <Search
-          size={16}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-        />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
       </div>
 
       {searchResults.length > 0 && (
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="p-3 border-b border-gray-100">
-            <h3 className="font-medium text-sm text-gray-700">Kết quả tìm kiếm</h3>
+        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg">
+          <div className="border-b border-gray-100 p-3">
+            <h3 className="text-sm font-medium text-gray-700">Kết quả tìm kiếm</h3>
           </div>
-          
+
           {isLoading ? (
             <div className="p-4 text-center">
-              <div className="inline-block h-5 w-5 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
-            </div>
-          ) : searchResults.length === 0 ? (
-            <div className="p-4 text-center text-gray-500 text-sm">
-              Không tìm thấy kết quả
+              <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-blue-300 border-t-blue-600"></div>
             </div>
           ) : (
-            <div className="max-h-[240px] overflow-y-auto">
+            <div className="max-h-60 overflow-y-auto py-2">
               {searchResults.map((user) => (
-                <div
-                  key={user._id}
-                  className="px-3 py-2.5 flex items-center gap-3 hover:bg-gray-50 cursor-pointer transition-colors"
-                  onClick={() => startNewConversation(user._id)}
-                >
-                  <Avatar className="w-9 h-9 ring-2 ring-gray-50">
-                    <AvatarImage src={user.profilePicture || "/default-avatar.png"} alt={user.name} />
-                    <AvatarFallback>{user.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-medium text-sm text-gray-800">{user.name}</p>
-                    <p className="text-xs text-gray-500">
-                      @{user.username || user.email.split("@")[0]}
-                    </p>
+                <div key={user._id} className="px-3 py-2 hover:bg-gray-50">
+                  <div
+                    className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors"
+                    onClick={() => startNewConversation(user._id)}
+                  >
+                    <Avatar className="h-10 w-10 ring-2 ring-gray-50">
+                      <AvatarImage
+                        src={user.profilePicture || "/default-avatar.png"}
+                        alt={user.name}
+                      />
+                      <AvatarFallback>{user.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">{user.name}</p>
+                      <p className="text-xs text-gray-500">
+                        @{user.username || user.email.split("@")[0]}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -221,41 +222,43 @@ export default function ConversationForm({
         </div>
       )}
 
-      <h2 className="text-base font-semibold text-gray-800 pt-1">Tin nhắn gần đây</h2>
+      <h2 className="pt-1 text-base font-semibold text-gray-800">Tin nhắn gần đây</h2>
 
       {isLoading ? (
         <div className="flex justify-center py-8">
-          <div className="h-6 w-6 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-300 border-t-blue-600"></div>
         </div>
       ) : (
         <>
           {conversations.length === 0 ? (
-            <div className="text-center py-8 px-4">
-              <div className="bg-gray-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="px-4 py-8 text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
                 <Users size={24} className="text-gray-400" />
               </div>
-              <p className="text-gray-700 font-medium">Không có cuộc trò chuyện nào</p>
-              <p className="text-xs text-gray-500 mt-1">Tìm kiếm người dùng để bắt đầu trò chuyện</p>
+              <h3 className="mb-1 text-base font-medium text-gray-700">Chưa có cuộc trò chuyện</h3>
+              <p className="text-sm text-gray-500">Tìm kiếm người dùng để bắt đầu trò chuyện</p>
             </div>
           ) : (
-            <div className="space-y-1 overflow-y-auto">
+            <div className="space-y-2">
               {conversations.map((conv) => {
-                const userOther = conv.participants.find((u) => u._id !== me._id);
-                if (!userOther) return null;
+                const userOther =
+                  conv.participants.find((user) => user._id !== me._id) ||
+                  ({
+                    _id: "",
+                    name: "Unknown",
+                  } as User);
                 const online = isUserOnline(userOther._id);
 
                 return (
                   <div
                     key={conv._id}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
-                      activeConversation === conv._id 
-                        ? "bg-blue-50 shadow-sm" 
-                        : "hover:bg-gray-50"
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
+                      activeConversation === conv._id ? "bg-blue-50 shadow-sm" : "hover:bg-gray-50"
                     }`}
                     onClick={() => handleOpenChat(conv._id)}
                   >
                     <div className="relative">
-                      <Avatar className="w-12 h-12">
+                      <Avatar className="h-12 w-12">
                         <AvatarImage
                           src={userOther.profilePicture || "/default-avatar.png"}
                           alt={userOther.name}
@@ -263,29 +266,31 @@ export default function ConversationForm({
                         <AvatarFallback>{userOther.name[0]}</AvatarFallback>
                       </Avatar>
                       {online && (
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm"></span>
+                        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500 shadow-sm"></span>
                       )}
                     </div>
 
-                    <div className="flex-1 min-w-0 py-0.5">
-                      <div className="flex justify-between items-center">
-                        <p className="font-medium text-gray-800 truncate">{userOther.name}</p>
+                    <div className="min-w-0 flex-1 py-0.5">
+                      <div className="flex items-center justify-between">
+                        <p className="truncate font-medium text-gray-800">{userOther.name}</p>
                         {conv.lastMessage?.createdAt && (
-                          <span className="text-xs text-gray-500 flex-shrink-0">
+                          <span className="flex-shrink-0 text-xs text-gray-500">
                             {formatLastMessageTime(conv.lastMessage.createdAt)}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 truncate">
+                      <p className="truncate text-sm text-gray-600">
                         {conv.lastMessage ? (
                           <>
                             {me._id === conv.lastMessage.sender ? (
-                              <span className="text-gray-500 font-medium">Bạn: </span>
-                            ) : ""}
+                              <span className="font-medium text-gray-500">Bạn: </span>
+                            ) : (
+                              ""
+                            )}
                             {conv.lastMessage.text}
                           </>
                         ) : (
-                          <span className="text-gray-400 italic">Chưa có tin nhắn</span>
+                          <span className="italic text-gray-400">Chưa có tin nhắn</span>
                         )}
                       </p>
                     </div>

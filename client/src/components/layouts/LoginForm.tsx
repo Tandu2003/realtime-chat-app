@@ -107,14 +107,19 @@ export default function LoginForm() {
   }, [isLoggedIn, router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 w-full">
-      <Card className="w-full max-w-md shadow-lg rounded-2xl border-0">
-        <CardContent className="p-8 space-y-8">
-          <h1 className="text-2xl font-semibold text-center text-gray-800">Đăng nhập</h1>
+    <div className="w-full max-w-md">
+      <Card className="overflow-hidden border-none shadow-lg">
+        <CardContent className="p-6 sm:p-8">
+          <div className="mb-6 text-center">
+            <h1 className="text-2xl font-bold text-gray-800">Đăng nhập</h1>
+            <p className="mt-2 text-sm text-gray-600">Đăng nhập để trò chuyện với bạn bè</p>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2.5">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                Email
+              </Label>
               <Input
                 name="email"
                 type="email"
@@ -122,13 +127,17 @@ export default function LoginForm() {
                 value={values.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`${errors.email ? "border-red-500 ring-red-200" : "focus:ring-primary/20"} h-11 rounded-xl transition-all`}
+                className={`${
+                  errors.email ? "border-red-500 ring-red-200" : "focus:ring-primary/20"
+                } h-11 rounded-xl shadow-sm transition-all`}
               />
-              {errors.email && <p className="text-sm text-red-500 font-medium">{errors.email}</p>}
+              {errors.email && <p className="text-sm font-medium text-red-500">{errors.email}</p>}
             </div>
 
             <div className="space-y-2.5">
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">Mật khẩu</Label>
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                Mật khẩu
+              </Label>
               <div className="relative">
                 <Input
                   name="password"
@@ -137,37 +146,44 @@ export default function LoginForm() {
                   value={values.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`${errors.password ? "border-red-500 ring-red-200" : "focus:ring-primary/20"} h-11 pr-10 rounded-xl transition-all`}
+                  className={`${
+                    errors.password ? "border-red-500 ring-red-200" : "focus:ring-primary/20"
+                  } h-11 pr-10 rounded-xl shadow-sm transition-all`}
                 />
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 right-3 cursor-pointer text-gray-500 hover:text-gray-700 transition-colors"
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors focus:outline-none"
                   onClick={() => setShowPassword((prev) => !prev)}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </div>
+                </button>
               </div>
-              {errors.password && <p className="text-sm text-red-500 font-medium">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-sm font-medium text-red-500">{errors.password}</p>
+              )}
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full h-11 rounded-xl font-medium transition-all hover:shadow-md" 
+            <Button
+              type="submit"
+              className="w-full h-11 rounded-xl font-semibold text-base transition-all hover:shadow-md"
               disabled={loading}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="inline-block h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
                   Đang xử lý...
                 </span>
-              ) : "Đăng nhập"}
+              ) : (
+                "Đăng nhập"
+              )}
             </Button>
 
             {apiMessage && (
               <div
-                className={`py-2 px-3 rounded-lg text-center text-sm font-medium ${
-                  apiMessage.type === "error" 
-                    ? "bg-red-50 text-red-600 border border-red-200" 
-                    : "bg-green-50 text-green-600 border border-green-200"
+                className={`rounded-lg border p-3 text-center text-sm font-medium ${
+                  apiMessage.type === "error"
+                    ? "border-red-200 bg-red-50 text-red-600"
+                    : "border-green-200 bg-green-50 text-green-600"
                 }`}
               >
                 {apiMessage.text}
@@ -175,12 +191,17 @@ export default function LoginForm() {
             )}
           </form>
 
-          <p className="text-sm text-center text-gray-600">
-            Chưa có tài khoản?{" "}
-            <a href="/register" className="text-blue-600 font-medium hover:text-blue-800 hover:underline transition-colors">
-              Đăng ký
-            </a>
-          </p>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Chưa có tài khoản?{" "}
+              <a
+                href="/register"
+                className="font-medium text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+              >
+                Đăng ký
+              </a>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

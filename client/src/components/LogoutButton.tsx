@@ -9,7 +9,7 @@ import { logout } from "@/redux/slices/userSlice";
 import AuthService from "@/services/auth";
 
 interface LogoutButtonProps {
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  variant?: "default" | "outline" | "secondary" | "ghost" | "link";
   showIcon?: boolean;
   className?: string;
 }
@@ -35,10 +35,10 @@ export default function LogoutButton({
   return (
     <Button
       variant={variant}
+      className={`font-medium transition-all ${className}`}
       onClick={handleLogout}
-      className={`transition-all ${className}`}
     >
-      {showIcon && <LogOut size={16} className="mr-2" />}
+      {showIcon && <LogOut size={16} className="mr-1.5" />}
       Đăng xuất
     </Button>
   );

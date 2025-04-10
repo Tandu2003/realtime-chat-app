@@ -123,11 +123,11 @@ export default function ChatForm({ conversationId }: ChatFormProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 relative">
+    <div className="relative flex h-full flex-col bg-gray-50">
       {/* Chat header */}
       {receiverInfo && (
-        <div className="flex items-center gap-3 px-6 py-3.5 border-b bg-white shadow-sm sticky top-0 z-10">
-          <Avatar className="w-10 h-10 ring-2 ring-primary/10">
+        <div className="sticky top-0 z-10 flex items-center gap-3 border-b bg-white px-6 py-3.5 shadow-sm">
+          <Avatar className="h-10 w-10 ring-2 ring-primary/10">
             <AvatarImage
               src={receiverInfo.profilePicture || "/default-avatar.png"}
               alt={receiverInfo.name}
@@ -136,15 +136,15 @@ export default function ChatForm({ conversationId }: ChatFormProps) {
           </Avatar>
           <div>
             <p className="font-medium text-gray-800">{receiverInfo.name}</p>
-            <p className="text-xs text-gray-500 flex items-center gap-1.5">
+            <p className="flex items-center gap-1.5 text-xs text-gray-500">
               {isOnline ? (
                 <>
-                  <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-500"></span>
                   <span>Đang hoạt động</span>
                 </>
               ) : (
                 <>
-                  <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full"></span>
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-gray-400"></span>
                   <span>Không hoạt động</span>
                 </>
               )}
@@ -154,18 +154,18 @@ export default function ChatForm({ conversationId }: ChatFormProps) {
       )}
 
       {/* Chat body */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5">
+      <div className="flex-1 space-y-5 overflow-y-auto p-4 md:p-6">
         {isLoading ? (
-          <div className="flex justify-center items-center h-full">
-            <div className="h-8 w-8 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+          <div className="flex h-full items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-300 border-t-blue-600"></div>
           </div>
         ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400 py-10">
-            <div className="bg-white p-5 rounded-full shadow-sm mb-4">
+          <div className="flex h-full flex-col items-center justify-center py-10 text-gray-400">
+            <div className="mb-4 rounded-full bg-white p-5 shadow-sm">
               <SendHorizonal size={24} className="text-gray-300" />
             </div>
-            <p className="text-gray-600 font-medium">Chưa có tin nhắn nào</p>
-            <p className="text-sm text-gray-500 mt-1">Hãy bắt đầu cuộc trò chuyện</p>
+            <p className="font-medium text-gray-600">Chưa có tin nhắn nào</p>
+            <p className="mt-1 text-sm text-gray-500">Hãy bắt đầu cuộc trò chuyện</p>
           </div>
         ) : (
           messages.map((msg, index) => {
@@ -183,10 +183,10 @@ export default function ChatForm({ conversationId }: ChatFormProps) {
                 300000; // 5 minutes
 
             return (
-              <div key={msg._id} className={`${timeGap ? "mt-6" : ""}`}>
+              <div key={msg._id} className={timeGap ? "mt-6" : ""}>
                 {timeGap && (
-                  <div className="flex justify-center mb-4">
-                    <span className="px-3 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
+                  <div className="mb-4 flex justify-center">
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-500">
                       {new Date(msg.createdAt).toLocaleString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -204,29 +204,27 @@ export default function ChatForm({ conversationId }: ChatFormProps) {
                   {!isMe && (
                     <div className="w-8 flex-shrink-0">
                       {showAvatar && (
-                        <Avatar className="w-8 h-8">
+                        <Avatar className="h-8 w-8">
                           <AvatarImage src={avatar} alt="avatar" />
                           <AvatarFallback>{msg.sender.name[0]}</AvatarFallback>
                         </Avatar>
                       )}
                     </div>
                   )}
-                  <div className="flex flex-col max-w-[75%] translate-y-5.5">
+                  <div className={`"max-w-[75%] flex flex-col ${isLast ? "translate-y-5.5" : ""}`}>
                     <div
-                      className={`px-4 py-2.5 rounded-2xl text-sm shadow-sm break-words ${
+                      className={`break-words rounded-2xl px-4 py-2.5 text-sm shadow-sm ${
                         isMe
-                          ? "bg-blue-600 text-white rounded-br-sm"
-                          : "bg-white text-gray-800 rounded-bl-sm border border-gray-100"
-                      } ${isMe && isLast ? "rounded-tr-xl" : ""} ${
-                        !isMe && isLast ? "rounded-tl-xl" : ""
+                          ? "rounded-br-sm rounded-tr-xl bg-blue-600 text-white"
+                          : "rounded-bl-sm rounded-tl-xl border border-gray-100 bg-white text-gray-800"
                       }`}
                     >
                       {msg.text}
                     </div>
                     {isLast && (
                       <span
-                        className={`text-xs text-gray-400 mt-1.5 ${
-                          isMe ? "text-right mr-1" : "text-left ml-1"
+                        className={`mt-1.5 text-xs text-gray-400 ${
+                          isMe ? "mr-1 text-right" : "ml-1 text-left"
                         }`}
                       >
                         {formatMessageTime(msg.createdAt)}
@@ -242,9 +240,9 @@ export default function ChatForm({ conversationId }: ChatFormProps) {
       </div>
 
       {/* Chat input */}
-      <div className="border-t px-4 py-3 bg-white flex gap-2 items-end sticky bottom-0 z-10">
+      <div className="sticky bottom-0 z-10 flex items-end gap-2 border-t bg-white px-4 py-3">
         <Textarea
-          className="flex-1 resize-none rounded-xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 min-h-12 max-h-36 shadow-sm transition-all"
+          className="min-h-12 max-h-36 flex-1 resize-none rounded-xl border border-gray-200 px-4 py-3 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
           placeholder="Nhập tin nhắn..."
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -253,8 +251,8 @@ export default function ChatForm({ conversationId }: ChatFormProps) {
         <Button
           size="icon"
           onClick={handleSendMessage}
-          className={`bg-blue-500 hover:bg-blue-600 rounded-full h-12 w-12 flex items-center justify-center transition-all shadow-sm ${
-            !text.trim() ? "opacity-50 cursor-not-allowed" : "hover:shadow-md"
+          className={`flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 shadow-sm transition-all hover:bg-blue-600 ${
+            !text.trim() ? "cursor-not-allowed opacity-50" : "hover:shadow-md"
           }`}
           disabled={!text.trim()}
         >

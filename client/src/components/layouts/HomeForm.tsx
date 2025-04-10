@@ -60,67 +60,65 @@ export default function HomeForm() {
 
   return (
     <RequireAuth>
-      <main className="flex flex-col md:flex-row h-screen bg-gray-100">
+      <main className="flex h-screen flex-col bg-gray-100 md:flex-row">
         {/* Header for mobile */}
-        <div className="md:hidden bg-white border-b sticky top-0 z-10 px-4 py-3 flex justify-between items-center shadow-sm">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-4 py-3.5 shadow-sm md:hidden">
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-full"
+            className="rounded-full text-gray-700 hover:bg-gray-100"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </Button>
 
-          <h1 className="font-semibold text-primary">Chat App</h1>
+          <h1 className="text-lg font-semibold text-primary">Chat App</h1>
 
-          <div className="flex items-center">
-            <Avatar className="w-8 h-8 ring-2 ring-primary/10">
-              <AvatarImage src={me.profilePicture || "/default-avatar.png"} alt={me.name} />
-              <AvatarFallback>{me.name?.[0]}</AvatarFallback>
-            </Avatar>
-          </div>
+          <Avatar className="h-8 w-8 ring-2 ring-primary/10">
+            <AvatarImage src={me.profilePicture || "/default-avatar.png"} alt={me.name} />
+            <AvatarFallback>{me.name?.[0]}</AvatarFallback>
+          </Avatar>
         </div>
 
         {/* Left side: Conversation List */}
         <div
           className={`${
             isMobileMenuOpen ? "block" : "hidden"
-          } md:block w-full md:w-[320px] lg:w-[360px] border-r md:max-w-xs bg-white overflow-hidden flex flex-col h-[calc(100vh-56px)] md:h-screen transition-all`}
+          } flex h-[calc(100vh-56px)] w-full flex-col overflow-hidden border-r bg-white transition-all md:block md:h-screen md:max-w-xs md:w-[320px] lg:w-[360px]`}
         >
           {/* User profile section */}
-          <div className="hidden md:flex items-center justify-between p-4 border-b">
+          <div className="hidden border-b p-4 md:flex md:items-center md:justify-between">
             <div className="flex items-center gap-3">
-              <Avatar className="w-10 h-10 ring-2 ring-primary/10">
+              <Avatar className="h-10 w-10 ring-2 ring-primary/10">
                 <AvatarImage src={me.profilePicture || "/default-avatar.png"} alt={me.name} />
                 <AvatarFallback>{me.name?.[0]}</AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium text-gray-800">{me.name}</p>
+                <p className="font-semibold text-gray-800">{me.name}</p>
                 <p className="text-xs text-gray-500">@{me.username}</p>
               </div>
             </div>
             <div className="flex gap-1.5">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="rounded-full h-8 w-8 hover:bg-gray-100"
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full hover:bg-gray-100"
               >
-                <Settings size={16} />
+                <Settings size={16} className="text-gray-600" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full h-8 w-8 hover:bg-gray-100"
+                className="h-8 w-8 rounded-full hover:bg-gray-100"
                 onClick={handleLogout}
               >
-                <LogOut size={16} />
+                <LogOut size={16} className="text-gray-600" />
               </Button>
             </div>
           </div>
 
           {/* Conversations */}
-          <div className="p-3 flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto p-3">
             <ConversationForm
               onSelectConversation={(id) => {
                 setSelectedConversationId(id);
@@ -131,10 +129,10 @@ export default function HomeForm() {
           </div>
 
           {/* Mobile logout button */}
-          <div className="md:hidden p-3 border-t">
+          <div className="border-t p-3 md:hidden">
             <Button
               variant="outline"
-              className="w-full flex items-center justify-center gap-2 h-10 rounded-xl"
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-xl"
               onClick={handleLogout}
             >
               <LogOut size={16} />
@@ -144,16 +142,20 @@ export default function HomeForm() {
         </div>
 
         {/* Right side: Chat Area */}
-        <div className={`flex-1 ${isMobileMenuOpen ? "hidden" : "block"} md:block h-[calc(100vh-56px)] md:h-screen`}>
+        <div
+          className={`flex-1 h-[calc(100vh-56px)] md:h-screen ${
+            isMobileMenuOpen ? "hidden" : "block"
+          } md:block`}
+        >
           {selectedConversationId ? (
             <ChatForm conversationId={selectedConversationId} />
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-gray-400 p-6">
-              <div className="bg-gray-100 rounded-full p-8 mb-6 shadow-inner">
+            <div className="flex h-full flex-col items-center justify-center p-6 text-gray-400">
+              <div className="mb-6 rounded-full bg-gray-100 p-8 shadow-inner">
                 <MessageSquare size={48} className="text-blue-500" />
               </div>
-              <h3 className="text-lg font-medium mb-2 text-gray-700">Tin nhắn của bạn</h3>
-              <p className="text-center max-w-sm text-gray-500">
+              <h3 className="mb-2 text-lg font-medium text-gray-700">Tin nhắn của bạn</h3>
+              <p className="max-w-sm text-center text-gray-500">
                 Chọn một cuộc trò chuyện từ danh sách hoặc tìm kiếm người dùng để bắt đầu chat
               </p>
             </div>
