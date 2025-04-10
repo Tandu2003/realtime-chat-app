@@ -1,8 +1,13 @@
 import { Model, Types } from 'mongoose';
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
@@ -99,5 +104,72 @@ export class UserService {
   // Trả về tất cả user đang online
   async getOnlineUsers() {
     return this.userModel.find({ isOnline: true });
+  }
+
+  async findByUsername(username: string) {
+    const user = await this.userModel.findOne({ username });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      updateProfileDto,
+      { new: true },
+    );
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async toggleFollow(currentUserId: string, targetUserId: string) {
+    // Don't allow users to follow themselves
+    if (currentUserId === targetUserId) {
+      throw new BadRequestException('You cannot follow yourself');
+    }
+
+    const currentUser = await this.userModel.findById(currentUserId);
+    const targetUser = await this.userModel.findById(targetUserId);
+
+    if (!currentUser || !targetUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if already following
+    const isFollowing = currentUser.following.includes(
+      new Types.ObjectId(targetUserId),
+    );
+
+    if (isFollowing) {
+      // Unfollow logic
+      await this.userModel.findByIdAndUpdate(currentUserId, {
+        $pull: { following: targetUserId },
+      });
+      await this.userModel.findByIdAndUpdate(targetUserId, {
+        $pull: { followers: currentUserId },
+      });
+    } else {
+      // Follow logic
+      await this.userModel.findByIdAndUpdate(currentUserId, {
+        $addToSet: { following: targetUserId },
+      });
+      await this.userModel.findByIdAndUpdate(targetUserId, {
+        $addToSet: { followers: currentUserId },
+      });
+    }
+
+    // Return updated current user and follow status
+    const updatedCurrentUser = await this.userModel.findById(currentUserId);
+
+    return {
+      isFollowing: !isFollowing,
+      currentUser: updatedCurrentUser,
+    };
   }
 }

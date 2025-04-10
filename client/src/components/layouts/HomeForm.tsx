@@ -74,7 +74,10 @@ export default function HomeForm() {
 
           <h1 className="text-lg font-semibold text-primary">Chat App</h1>
 
-          <Avatar className="h-8 w-8 ring-2 ring-primary/10">
+          <Avatar 
+            className="h-8 w-8 ring-2 ring-primary/10 cursor-pointer" 
+            onClick={() => router.push(`/${me.username}`)}
+          >
             <AvatarImage src={me.profilePicture || "/default-avatar.png"} alt={me.name} />
             <AvatarFallback>{me.name?.[0]}</AvatarFallback>
           </Avatar>
@@ -89,7 +92,10 @@ export default function HomeForm() {
           {/* User profile section */}
           <div className="hidden border-b p-4 md:flex md:items-center md:justify-between">
             <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10 ring-2 ring-primary/10">
+              <Avatar 
+                className="h-10 w-10 ring-2 ring-primary/10 cursor-pointer" 
+                onClick={() => router.push(`/${me.username}`)}
+              >
                 <AvatarImage src={me.profilePicture || "/default-avatar.png"} alt={me.name} />
                 <AvatarFallback>{me.name?.[0]}</AvatarFallback>
               </Avatar>

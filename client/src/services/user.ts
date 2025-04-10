@@ -20,6 +20,17 @@ const UserService = {
     const response = await axiosInstance.get(`/users/${userId}`);
     return response.data;
   },
+
+  // New methods for profile functionality
+  async getUserByUsername(username: string) {
+    const response = await axiosInstance.get(`/users/username/${username}`);
+    return response.data;
+  },
+
+  async updateProfile(profileData: { name: string; bio?: string; profilePicture?: string }) {
+    const response = await axiosInstance.put(`/users/profile`, profileData);
+    return response.data;
+  },
 };
 
 export default UserService;

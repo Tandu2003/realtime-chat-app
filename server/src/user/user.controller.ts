@@ -1,8 +1,18 @@
-import { Request } from "express";
+import { Request } from 'express';
 
-import { Controller, Get, Param, Post, Query, Req } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+} from '@nestjs/common';
 
-import { UserService } from "./user.service";
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
@@ -13,11 +23,11 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Post('follow/:targetId')
-  async followUser(@Param('targetId') targetId: string, @Req() req: Request) {
-    const userId = req['user'].userId;
-    return this.userService.follow(userId, targetId);
-  }
+  // @Post('follow/:targetId')
+  // async followUser(@Param('targetId') targetId: string, @Req() req: Request) {
+  //   const userId = req['user'].userId;
+  //   return this.userService.follow(userId, targetId);
+  // }
 
   @Get('search')
   async searchUsers(@Query('q') query: string, @Req() req: Request) {
@@ -34,5 +44,20 @@ export class UserController {
   @Get(':userId')
   async getUserById(@Param('userId') userId: string) {
     return this.userService.findById(userId);
+  }
+
+  @Get('username/:username')
+  async getUserByUsername(@Param('username') username: string) {
+    return this.userService.findByUsername(username);
+  }
+
+  @Put('profile')
+  async updateProfile(@Req() req, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.userService.updateProfile(req.user._id, updateProfileDto);
+  }
+
+  @Post('follow/:id')
+  async followUser(@Req() req, @Param('id') targetId: string) {
+    return this.userService.toggleFollow(req.user._id, targetId);
   }
 }
