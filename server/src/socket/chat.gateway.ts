@@ -1,5 +1,5 @@
-import { Server, Socket } from 'socket.io';
-import { ConversationService } from 'src/conversation/conversation.service';
+import { Server, Socket } from "socket.io";
+import { ConversationService } from "src/conversation/conversation.service";
 
 import {
   ConnectedSocket,
@@ -8,11 +8,11 @@ import {
   OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
-  WebSocketGateway,
-} from '@nestjs/websockets';
+  WebSocketGateway
+} from "@nestjs/websockets";
 
-import { MessageService } from '../message/message.service';
-import { UserService } from '../user/user.service';
+import { MessageService } from "../message/message.service";
+import { UserService } from "../user/user.service";
 
 @WebSocketGateway({
   cors: {

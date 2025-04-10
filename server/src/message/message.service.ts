@@ -1,9 +1,9 @@
-import { Model, Types } from 'mongoose';
+import { Model, Types } from "mongoose";
 
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
 
-import { Message, MessageDocument } from './schemas/message.schema';
+import { Message, MessageDocument } from "./schemas/message.schema";
 
 @Injectable()
 export class MessageService {
