@@ -9,7 +9,7 @@ import { logout } from "@/redux/slices/userSlice";
 import AuthService from "@/services/auth";
 
 interface LogoutButtonProps {
-  variant?: "default" | "outline" | "ghost";
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   showIcon?: boolean;
   className?: string;
 }
@@ -19,8 +19,8 @@ export default function LogoutButton({
   showIcon = true,
   className = "",
 }: LogoutButtonProps) {
-  const dispatch = useDispatch();
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const handleLogout = async () => {
     try {
@@ -28,7 +28,7 @@ export default function LogoutButton({
       dispatch(logout());
       router.push("/login");
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.error("Logout error:", error);
     }
   };
 
@@ -36,9 +36,9 @@ export default function LogoutButton({
     <Button
       variant={variant}
       onClick={handleLogout}
-      className={`flex items-center gap-2 ${className}`}
+      className={`transition-all ${className}`}
     >
-      {showIcon && <LogOut size={16} />}
+      {showIcon && <LogOut size={16} className="mr-2" />}
       Đăng xuất
     </Button>
   );

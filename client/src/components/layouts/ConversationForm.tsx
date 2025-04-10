@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -167,57 +167,78 @@ export default function ConversationForm({
   };
 
   return (
-    <div className="space-y-4 h-full flex flex-col">
+    <div className="space-y-5 h-full flex flex-col">
       <div className="relative">
         <Input
           type="text"
           placeholder="Tìm người dùng..."
-          className="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100"
           value={searchQuery}
           onChange={handleSearch}
+          className="pl-9 pr-3 h-10 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400 focus:ring-blue-100"
         />
-        <Search className="absolute top-2.5 left-3 text-gray-400" size={18} />
+        <Search
+          size={16}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+        />
       </div>
 
       {searchResults.length > 0 && (
-        <div className="mt-2 bg-white rounded-lg shadow-lg p-2 absolute z-10 left-4 right-4 border border-gray-200">
-          <h3 className="text-xs font-medium text-gray-500 px-2 pb-1">Kết quả tìm kiếm</h3>
-          {searchResults.map((user) => (
-            <div
-              key={user._id}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition"
-              onClick={() => startNewConversation(user._id)}
-            >
-              <Avatar className="w-9 h-9">
-                <AvatarImage src={user.profilePicture || "/default-avatar.png"} alt={user.name} />
-                <AvatarFallback>{user.name[0]}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="font-medium text-sm">{user.name}</p>
-                <p className="text-xs text-gray-500">
-                  @{user.username || user.email.split("@")[0]}
-                </p>
-              </div>
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="p-3 border-b border-gray-100">
+            <h3 className="font-medium text-sm text-gray-700">Kết quả tìm kiếm</h3>
+          </div>
+          
+          {isLoading ? (
+            <div className="p-4 text-center">
+              <div className="inline-block h-5 w-5 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
             </div>
-          ))}
+          ) : searchResults.length === 0 ? (
+            <div className="p-4 text-center text-gray-500 text-sm">
+              Không tìm thấy kết quả
+            </div>
+          ) : (
+            <div className="max-h-[240px] overflow-y-auto">
+              {searchResults.map((user) => (
+                <div
+                  key={user._id}
+                  className="px-3 py-2.5 flex items-center gap-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => startNewConversation(user._id)}
+                >
+                  <Avatar className="w-9 h-9 ring-2 ring-gray-50">
+                    <AvatarImage src={user.profilePicture || "/default-avatar.png"} alt={user.name} />
+                    <AvatarFallback>{user.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm text-gray-800">{user.name}</p>
+                    <p className="text-xs text-gray-500">
+                      @{user.username || user.email.split("@")[0]}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      <h2 className="text-lg font-semibold">Tin nhắn gần đây</h2>
+      <h2 className="text-base font-semibold text-gray-800 pt-1">Tin nhắn gần đây</h2>
 
       {isLoading ? (
-        <div className="flex justify-center py-10">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+        <div className="flex justify-center py-8">
+          <div className="h-6 w-6 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
         </div>
       ) : (
         <>
           {conversations.length === 0 ? (
-            <div className="text-center py-10 text-gray-500">
-              <p>Chưa có cuộc trò chuyện nào.</p>
-              <p className="text-sm mt-2">Tìm kiếm người dùng để bắt đầu trò chuyện</p>
+            <div className="text-center py-8 px-4">
+              <div className="bg-gray-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Users size={24} className="text-gray-400" />
+              </div>
+              <p className="text-gray-700 font-medium">Không có cuộc trò chuyện nào</p>
+              <p className="text-xs text-gray-500 mt-1">Tìm kiếm người dùng để bắt đầu trò chuyện</p>
             </div>
           ) : (
-            <div className="space-y-1 flex-1 overflow-y-auto">
+            <div className="space-y-1 overflow-y-auto">
               {conversations.map((conv) => {
                 const userOther = conv.participants.find((u) => u._id !== me._id);
                 if (!userOther) return null;
@@ -226,8 +247,10 @@ export default function ConversationForm({
                 return (
                   <div
                     key={conv._id}
-                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${
-                      activeConversation === conv._id ? "bg-blue-50" : "hover:bg-gray-50"
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
+                      activeConversation === conv._id 
+                        ? "bg-blue-50 shadow-sm" 
+                        : "hover:bg-gray-50"
                     }`}
                     onClick={() => handleOpenChat(conv._id)}
                   >
@@ -240,23 +263,25 @@ export default function ConversationForm({
                         <AvatarFallback>{userOther.name[0]}</AvatarFallback>
                       </Avatar>
                       {online && (
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm"></span>
                       )}
                     </div>
 
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 py-0.5">
                       <div className="flex justify-between items-center">
-                        <p className="font-medium truncate">{userOther.name}</p>
+                        <p className="font-medium text-gray-800 truncate">{userOther.name}</p>
                         {conv.lastMessage?.createdAt && (
                           <span className="text-xs text-gray-500 flex-shrink-0">
                             {formatLastMessageTime(conv.lastMessage.createdAt)}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500 truncate">
+                      <p className="text-sm text-gray-600 truncate">
                         {conv.lastMessage ? (
                           <>
-                            {me._id === conv.lastMessage.sender ? "Bạn: " : ""}
+                            {me._id === conv.lastMessage.sender ? (
+                              <span className="text-gray-500 font-medium">Bạn: </span>
+                            ) : ""}
                             {conv.lastMessage.text}
                           </>
                         ) : (
